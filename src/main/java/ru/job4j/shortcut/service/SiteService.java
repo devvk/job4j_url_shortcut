@@ -1,6 +1,7 @@
 package ru.job4j.shortcut.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,8 +32,13 @@ public class SiteService {
         newSite.setDomain(requestDto.site());
         newSite.setLogin(credentials);
         newSite.setPassword(passwordEncoder.encode(credentials));
-        siteRepository.save(newSite);
-        return new RegistrationResponseDto(true, credentials, credentials);
+
+        try {
+            siteRepository.save(newSite);
+            return new RegistrationResponseDto(true, credentials, credentials);
+        } catch (DataIntegrityViolationException ex) {
+            return new RegistrationResponseDto(false, null, null);
+        }
     }
 
     public List<StatisticResponseDto> getStatistic(String login) {

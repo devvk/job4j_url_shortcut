@@ -13,6 +13,7 @@ import ru.job4j.shortcut.model.Url;
 import ru.job4j.shortcut.repository.SiteRepository;
 import ru.job4j.shortcut.repository.UrlRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,8 +25,13 @@ public class UrlService {
 
     @Transactional
     public ConvertResponseDto convert(ConvertRequestDto requestDto, String login) {
-        Site site = siteRepository.findByLogin(login)
-                .orElseThrow(() -> new UsernameNotFoundException(login));
+        Site site = siteRepository.findByLogin(login).orElseThrow(() -> new UsernameNotFoundException(login));
+
+        Optional<Url> existingUrl = urlRepository.findBySiteAndOriginalUrl(site, requestDto.url());
+        if (existingUrl.isPresent()) {
+            return new ConvertResponseDto(existingUrl.get().getShortCode());
+        }
+
         String code = generateUniqueCode();
         Url url = new Url();
         url.setShortCode(code);

@@ -8,7 +8,8 @@ CREATE TABLE urls
     original_url VARCHAR(255)       NOT NULL,
     visit_count  INTEGER            NOT NULL DEFAULT 0,
     site_id      INTEGER            NOT NULL REFERENCES sites (id),
-    created_at   TIMESTAMP          NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at   TIMESTAMP          NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uk_site_url UNIQUE(site_id, original_url)
 );
 
 --rollback DROP TABLE urls;
